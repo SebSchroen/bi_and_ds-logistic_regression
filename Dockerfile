@@ -12,7 +12,7 @@ WORKDIR /srv/shiny-server/
 
 # Copy Shiny files
 COPY /app.R ./app.R
-
+COPY /R ./R
 
 # Copy renv.lock file
 COPY /renv.lock ./renv.lock
