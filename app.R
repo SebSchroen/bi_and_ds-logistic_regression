@@ -1,5 +1,7 @@
 library(shiny)
 library(ggplot2)
+library(tidyverse)
+data <- read_csv("rawdata/songs_with_features.csv")
 
 # Define UI for application
 ui <- fluidPage(
@@ -42,6 +44,8 @@ server <- function(input, output) {
     intercept <- -input$slope * 0.5
     logistic(x, input$slope, intercept)
   })
+  
+  
   
   # Render plot
   output$logistic_plot <- renderPlot({
