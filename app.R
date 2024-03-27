@@ -1,6 +1,6 @@
 library(shiny)
 library(ggplot2)
-library(tidyverse)
+library(readr)
 data <- read_csv("rawdata/songs_with_features.csv")
 
 # Define UI for application
