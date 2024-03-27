@@ -46,7 +46,7 @@ ui <- fluidPage(
 
     # Show plot
     mainPanel(
-      plotlyOutput("logistic_plot"),
+      plotOutput("logistic_plot"),
       plotOutput("confusion")
     )
   )
@@ -83,7 +83,7 @@ server <- function(input, output) {
   
   
   # Render plot
-  output$logistic_plot <- renderPlotly({
+  output$logistic_plot <- renderPlot({
  #   x <- seq(0, 1, length.out = input$n)
     data_tmp <- sample()
     x <- seq(0, 1, length.out = input$n)
@@ -104,12 +104,12 @@ server <- function(input, output) {
     
     plot <- ggplot(data_for_plot) + 
       geom_line(aes(x = x, y = y) , linewidth = 1) +
-      geom_point(aes(x = energy, y = edm, color = pred_class), size = 3) +
+      geom_point(aes(x = energy, y = edm, color = pred_class), size = 5) +
       labs(x = "Energy", y = "EDM", color = "Vorhersage") + 
       geom_hline(yintercept = input$C, linetype = "dashed", alpha = 0.5) +
       geom_vline(xintercept = x_intersection, linetype = "dashed", alpha = 0.5) +
       theme_minimal()
-    ggplotly(plot)
+    plot
   })
   
   output$predictions <- renderDataTable({

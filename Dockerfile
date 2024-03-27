@@ -22,7 +22,7 @@ COPY /renv.lock ./renv.lock
 ENV RENV_VERSION 1.0.5
 RUN Rscript -e "install.packages('remotes', repos = c(CRAN = 'https://cloud.r-project.org'))"
 RUN Rscript -e "install.packages('tidyverse', repos = c(CRAN = 'https://cloud.r-project.org'))"
-RUN Rscript -e "install.packages('tidymodels', repos = c(CRAN = 'https://cloud.r-project.org'))"
+#RUN Rscript -e "install.packages('tidymodels', repos = c(CRAN = 'https://cloud.r-project.org'))"
 RUN Rscript -e "install.packages('plotly', repos = c(CRAN = 'https://cloud.r-project.org'))"
 RUN Rscript -e "remotes::install_github('rstudio/renv@v${RENV_VERSION}')"
 ENV RENV_PATHS_LIBRARY renv/library
