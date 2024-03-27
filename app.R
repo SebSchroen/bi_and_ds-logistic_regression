@@ -3,7 +3,7 @@ library(ggplot2)
 library(dplyr)
 library(readr)
 library(rsample)
-library(plotly)
+#library(plotly)
 
 
 data <- read_csv("rawdata/songs_with_features.csv") %>% 
