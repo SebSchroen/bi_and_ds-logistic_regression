@@ -112,20 +112,20 @@ server <- function(input, output) {
     plot
   })
   
-  output$predictions <- renderDataTable({
- #   x <- seq(0, 1, length.out = input$n)
-    data_tmp <- sample()
-    x <- seq(0, 1, length.out = input$n)
-    data_for_plot <- cbind(data_tmp, tibble(x = x, y = y()))
-    data_for_plot <- data_for_plot %>% 
-      mutate(pred = logistic(energy, input$slope, -input$slope * 0.5)) %>% 
-      mutate(pred_class = ifelse(pred > input$C, 1, 0)) %>% 
-      rename(p_edm = pred) %>% 
-      select(track.name, track.artist,  energy, p_edm, edm, pred_class)  %>% 
-      mutate(p_edm = round(p_edm, 5)) %>% 
-      arrange(energy)
-    data_for_plot
-  })
+ #  output$predictions <- renderDataTable({
+ # #   x <- seq(0, 1, length.out = input$n)
+ #    data_tmp <- sample()
+ #    x <- seq(0, 1, length.out = input$n)
+ #    data_for_plot <- cbind(data_tmp, tibble(x = x, y = y()))
+ #    data_for_plot <- data_for_plot %>% 
+ #      mutate(pred = logistic(energy, input$slope, -input$slope * 0.5)) %>% 
+ #      mutate(pred_class = ifelse(pred > input$C, 1, 0)) %>% 
+ #      rename(p_edm = pred) %>% 
+ #      select(track.name, track.artist,  energy, p_edm, edm, pred_class)  %>% 
+ #      mutate(p_edm = round(p_edm, 5)) %>% 
+ #      arrange(energy)
+ #    data_for_plot
+ #  })
   
   output$confusion <- renderPlot({
     x <- seq(0, 1, length.out = input$n)

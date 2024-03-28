@@ -25,6 +25,7 @@ RUN Rscript -e "install.packages('ggplot2', repos = c(CRAN = 'https://cloud.r-pr
 RUN Rscript -e "install.packages('dplyr', repos = c(CRAN = 'https://cloud.r-project.org'))"
 RUN Rscript -e "install.packages('readr', repos = c(CRAN = 'https://cloud.r-project.org'))"
 RUN Rscript -e "install.packages('rsample', repos = c(CRAN = 'https://cloud.r-project.org'))"
+RUN Rscript -e "install.packages('yardstick', repos = c(CRAN = 'https://cloud.r-project.org'))"
 #RUN Rscript -e "install.packages('plotly', repos = c(CRAN = 'https://cloud.r-project.org'))"
 RUN Rscript -e "remotes::install_github('rstudio/renv@v${RENV_VERSION}')"
 ENV RENV_PATHS_LIBRARY renv/library
