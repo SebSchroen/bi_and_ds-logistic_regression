@@ -1,0 +1,6 @@
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("rsample")
+install.packages("readr")
+install.packages("yardstick")
+install.packages("shiny")

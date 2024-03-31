@@ -2,10 +2,9 @@ library(shiny)
 library(ggplot2)
 library(dplyr)
 library(readr)
-library(rsample)
-#library(plotly)
 
 
+set.seed(1)
 data <- read_csv("rawdata/songs_with_features.csv") %>% 
   filter(category %in% c("Klassik", "Dance/Electronic")) %>% 
   select(track.name, track.artist, category, energy, danceability) %>% 
@@ -19,7 +18,8 @@ data <- read_csv("rawdata/songs_with_features.csv") %>%
   )) %>% 
   mutate(edm_factor = as.factor(edm)) %>% 
   filter(category %in% c("Klassik", "EDM"))  %>% 
-  filter(energy > 0.05 & energy < 0.95) 
+  filter(energy > 0.05 & energy < 0.95)  %>% 
+  sample_n(100)
 
 
 
@@ -39,8 +39,8 @@ ui <- fluidPage(
                   min = 1, 
                   max = 100, 
                   value = 26),
-      sliderInput("n", "Number of samples", min = 10, max = 1000, value = 100, step = 10),
-      sliderInput("C", "Threshold value", min = 0.001, max = 0.999, value = 0.5),
+     # sliderInput("n", "Number of samples", min = 10, max = 1000, value = 100, step = 10),
+      sliderInput("C", "Threshold value", min = 0.00001, max = 0.9999, value = 0.5),
       textOutput("accuracy")
     ),
 
@@ -56,13 +56,6 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   
-  sample <- reactive({
-    set.seed(1)
-    data %>% 
-      sample_n(input$n)
-    
-  })
-  
   
   # Function to calculate logistic function
   logistic <- function(x, slope, intercept) {
@@ -73,8 +66,8 @@ server <- function(input, output) {
   
   # Reactive expression for y values based on input$slope and adjusted intercept
   y <- reactive({
-    data_tmp <- sample()
-    x <- seq(0, 1, length.out = input$n)
+    data_tmp <- data
+    x <- seq(0, 1, length.out = 100)
     # Adjust intercept to ensure crossing y at roughly 0.5
     intercept <- -input$slope * 0.5
     logistic(x, input$slope, intercept)
@@ -84,9 +77,9 @@ server <- function(input, output) {
   
   # Render plot
   output$logistic_plot <- renderPlot({
- #   x <- seq(0, 1, length.out = input$n)
-    data_tmp <- sample()
-    x <- seq(0, 1, length.out = input$n)
+ #   x <- seq(0, 1, length.out = 100)
+    data_tmp <- data
+    x <- seq(0, 1, length.out = 100)
     data_for_plot <- cbind(data_tmp, tibble(x = x, y = y())) %>% 
       mutate(pred = logistic(energy, input$slope, -input$slope * 0.5)) %>% 
       mutate(pred_class = ifelse(pred > input$C, 1, 0)) %>% 
@@ -113,9 +106,9 @@ server <- function(input, output) {
   })
   
  #  output$predictions <- renderDataTable({
- # #   x <- seq(0, 1, length.out = input$n)
- #    data_tmp <- sample()
- #    x <- seq(0, 1, length.out = input$n)
+ # #   x <- seq(0, 1, length.out = 100)
+ #    data_tmp <- data
+ #    x <- seq(0, 1, length.out = 100)
  #    data_for_plot <- cbind(data_tmp, tibble(x = x, y = y()))
  #    data_for_plot <- data_for_plot %>% 
  #      mutate(pred = logistic(energy, input$slope, -input$slope * 0.5)) %>% 
@@ -128,8 +121,8 @@ server <- function(input, output) {
  #  })
   
   output$confusion <- renderPlot({
-    x <- seq(0, 1, length.out = input$n)
-    data_tmp <- sample()
+    x <- seq(0, 1, length.out = 100)
+    data_tmp <- data
     data_for_plot <- cbind(data_tmp, tibble(x = x, y = y()))
     predictions <- data_for_plot %>% 
       mutate(pred = logistic(energy, input$slope, -input$slope * 0.5)) %>% 
@@ -148,8 +141,8 @@ server <- function(input, output) {
   })
  
   output$accuracy <- renderText({
-    x <- seq(0, 1, length.out = input$n)
-    data_tmp <- sample()
+    x <- seq(0, 1, length.out = 100)
+    data_tmp <- data
     data_for_plot <- cbind(data_tmp, tibble(x = x, y = y()))
     predictions <- data_for_plot %>% 
       mutate(pred = logistic(energy, input$slope, -input$slope * 0.5)) %>% 
@@ -162,7 +155,7 @@ server <- function(input, output) {
     accuracy <- yardstick::accuracy(predictions, truth = edm_factor, estimate = pred_class) %>% 
       pull(.estimate)
     
-    paste("Accuracy: ", 100*round(accuracy, 2), "%")
+    paste("Accuracy: ", 100*round(accuracy, 4), "%")
   })
    
 }
