@@ -22,7 +22,7 @@ data <- read_csv("rawdata/songs_with_features.csv") %>%
   sample_n(100)
 
 
-
+slope <- 26
 
 # Define UI for application
 ui <- fluidPage(
@@ -34,13 +34,13 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       # Slider input for slope parameter
-      sliderInput("slope", 
-                  "Curvature Parameter:", 
-                  min = 1, 
-                  max = 100, 
-                  value = 26),
+      # sliderInput("slope", 
+      #             "Curvature Parameter:", 
+      #             min = 1, 
+      #             max = 100, 
+      #             value = 26),
      # sliderInput("n", "Number of samples", min = 10, max = 1000, value = 100, step = 10),
-      sliderInput("C", "Threshold value", min = 0.00001, max = 0.9999, value = 0.5),
+      sliderInput("C", "Threshold value C", min = 0.00001, max = 0.9999, value = 0.5),
       textOutput("accuracy")
     ),
 
@@ -64,13 +64,13 @@ server <- function(input, output) {
   
   # Generate x values
   
-  # Reactive expression for y values based on input$slope and adjusted intercept
+  # Reactive expression for y values based on slope and adjusted intercept
   y <- reactive({
     data_tmp <- data
     x <- seq(0, 1, length.out = 100)
     # Adjust intercept to ensure crossing y at roughly 0.5
-    intercept <- -input$slope * 0.5
-    logistic(x, input$slope, intercept)
+    intercept <- -slope * 0.5
+    logistic(x, slope, intercept)
   })
   
   
@@ -81,7 +81,7 @@ server <- function(input, output) {
     data_tmp <- data
     x <- seq(0, 1, length.out = 100)
     data_for_plot <- cbind(data_tmp, tibble(x = x, y = y())) %>% 
-      mutate(pred = logistic(energy, input$slope, -input$slope * 0.5)) %>% 
+      mutate(pred = logistic(energy, slope, -slope * 0.5)) %>% 
       mutate(pred_class = ifelse(pred > input$C, 1, 0)) %>% 
       mutate(pred_class = factor(pred_class)) %>% 
       mutate(diff = (input$C - y())^2)
@@ -111,7 +111,7 @@ server <- function(input, output) {
  #    x <- seq(0, 1, length.out = 100)
  #    data_for_plot <- cbind(data_tmp, tibble(x = x, y = y()))
  #    data_for_plot <- data_for_plot %>% 
- #      mutate(pred = logistic(energy, input$slope, -input$slope * 0.5)) %>% 
+ #      mutate(pred = logistic(energy, slope, -slope * 0.5)) %>% 
  #      mutate(pred_class = ifelse(pred > input$C, 1, 0)) %>% 
  #      rename(p_edm = pred) %>% 
  #      select(track.name, track.artist,  energy, p_edm, edm, pred_class)  %>% 
@@ -125,7 +125,7 @@ server <- function(input, output) {
     data_tmp <- data
     data_for_plot <- cbind(data_tmp, tibble(x = x, y = y()))
     predictions <- data_for_plot %>% 
-      mutate(pred = logistic(energy, input$slope, -input$slope * 0.5)) %>% 
+      mutate(pred = logistic(energy, slope, -slope * 0.5)) %>% 
       mutate(pred_class = ifelse(pred > input$C, 1, 0)) %>% 
       rename(p_edm = pred) %>% 
       mutate(pred_class = factor(pred_class)) %>% 
@@ -145,7 +145,7 @@ server <- function(input, output) {
     data_tmp <- data
     data_for_plot <- cbind(data_tmp, tibble(x = x, y = y()))
     predictions <- data_for_plot %>% 
-      mutate(pred = logistic(energy, input$slope, -input$slope * 0.5)) %>% 
+      mutate(pred = logistic(energy, slope, -slope * 0.5)) %>% 
       mutate(pred_class = ifelse(pred > input$C, 1, 0)) %>% 
       rename(p_edm = pred) %>% 
       mutate(pred_class = factor(pred_class)) %>% 
