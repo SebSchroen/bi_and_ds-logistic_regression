@@ -2,7 +2,7 @@ library(shiny)
 library(ggplot2)
 library(dplyr)
 library(readr)
-
+library(yardstick)
 
 set.seed(1)
 data <- read_csv("rawdata/songs_with_features.csv") %>% 
@@ -41,7 +41,7 @@ ui <- fluidPage(
       #             value = 26),
      # sliderInput("n", "Number of samples", min = 10, max = 1000, value = 100, step = 10),
       sliderInput("C", "Threshold value C", min = 0.00001, max = 0.9999, value = 0.5),
-      textOutput("accuracy")
+      tableOutput("accuracy")
     ),
 
     # Show plot
@@ -132,7 +132,7 @@ server <- function(input, output) {
       mutate(p_edm = round(p_edm, 5)) %>% 
       arrange(energy)
     
-    yardstick::conf_mat(predictions, truth = edm_factor, estimate = pred_class) %>% 
+    conf_mat(predictions, truth = edm_factor, estimate = pred_class) %>% 
       autoplot(type = "heatmap") +
       labs(x = "Wahrheit", y = "Vorhersage") + 
       ggtitle("Konfusionsmatrix")
@@ -140,7 +140,7 @@ server <- function(input, output) {
     
   })
  
-  output$accuracy <- renderText({
+  output$accuracy <- renderTable({
     x <- seq(0, 1, length.out = 100)
     data_tmp <- data
     data_for_plot <- cbind(data_tmp, tibble(x = x, y = y()))
@@ -152,10 +152,15 @@ server <- function(input, output) {
       mutate(p_edm = round(p_edm, 5)) %>% 
       arrange(energy)
     
-    accuracy <- yardstick::accuracy(predictions, truth = edm_factor, estimate = pred_class) %>% 
-      pull(.estimate)
     
-    paste("Accuracy: ", 100*round(accuracy, 4), "%")
+    multi_metric <- metric_set(accuracy, recall, precision)
+    
+    multi_metric(predictions, truth = edm_factor, estimate = pred_class, event_level = "second") %>% 
+      select(-.estimator) %>%
+      rename(metric = .metric,
+             value = .estimate) %>%
+      mutate(value = paste0(100*round(value, 4),'%')) 
+    
   })
    
 }
